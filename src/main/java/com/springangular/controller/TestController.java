@@ -1,13 +1,12 @@
 package com.springangular.controller;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.springangular.model.Test;
+import com.springangular.services.TestServices;
 
 /**
  * test rest controller to serve all test requests
@@ -25,6 +25,9 @@ import com.springangular.model.Test;
 @RestController
 public class TestController {
 
+	@Autowired
+	TestServices testService;
+	
 	//logger for debugging
 	private static final Logger LOGGER =
 			LoggerFactory.getLogger(TestController.class);
@@ -45,6 +48,7 @@ public class TestController {
 	@ResponseBody
 	public Test getRecordByID(@PathVariable("id") long id) {
 		LOGGER.debug("in get by id");
+		testService.getRecordByID(id);
 		Test t = map.get(id);
 		return t;
 	}
@@ -57,10 +61,7 @@ public class TestController {
 	@ResponseBody
 	public List<Test> getRecords() {
 		LOGGER.debug("in get");
-		List<Test> tests = new ArrayList<Test>();
-		for(Entry<Long, Test> t : map.entrySet())
-			tests.add(t.getValue());
-		LOGGER.debug(map.keySet().toString());
+		List<Test> tests = testService.getAllRecords();
 		return tests;
 	}
 	
@@ -72,8 +73,7 @@ public class TestController {
 	@ResponseBody
 	public void createRecord(@RequestBody Test t) {
 		LOGGER.debug("in create");
-		t.setId(getNextIndex());
-		map.put(t.getId(), t);
+		testService.saveRecord(t);
 	}
 	
 	/**
@@ -84,19 +84,7 @@ public class TestController {
 	@ResponseBody
 	public void deleteRecord(@PathVariable("id") long id) {
 		LOGGER.debug("in delete");
-		map.remove(id);
+		testService.removeRecord(id);
 	}
 	
-	/**
-	 * method to get the next index.
-	 * @return
-	 */
-	private long getNextIndex(){
-		long m = 0;
-		for(Long l : map.keySet()){
-			if(l > m)
-				m = l;
-		}
-		return m+1l;
-	}
 }

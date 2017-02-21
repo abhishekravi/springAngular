@@ -2,65 +2,83 @@ package com.springangular.dao;
 
 import java.util.List;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.springangular.model.Test;
 
 /**
  * DAO implementation.
+ * 
  * @author Abhishek Ravi Chandran
  *
  */
-public class TestDAOImpl implements TestDAO{
+@Repository("testDao")
+public class TestDAOImpl implements TestDAO {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TestDAOImpl.class);
-	private SessionFactory sessionFactory;
-	
-	public void setSessionFactory(SessionFactory sf){
-		this.sessionFactory = sf;
+
+	@Autowired
+	private EntityManagerFactory entityManagerFactory;
+
+	private EntityManager getEntityManager() {
+		return entityManagerFactory.createEntityManager();
 	}
-	
+
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Test> getAllRecords() {
 		LOGGER.debug("getting all records");
-		Session session = this.sessionFactory.getCurrentSession();
-		List<Test> tests = session.createQuery("from test").list();
-		return tests;
+		Query q = getEntityManager().createQuery("from Test t", Test.class);
+		return q.getResultList();
 	}
 
 	@Override
 	public Test getRecordByID(long id) {
 		LOGGER.debug("getting record by id");
-		Session session = this.sessionFactory.getCurrentSession();
-		Test t = session.load(Test.class, id);
+		Test t = this.getEntityManager().find(Test.class, id);
 		return t;
 	}
 
 	@Override
 	public void insertRecord(Test t) {
 		LOGGER.debug("inserting record");
-		Session session = this.sessionFactory.getCurrentSession();
-		session.persist(t);
+		EntityManager em = getEntityManager();
+		em.getTransaction().begin();
+		em.persist(t);
+		em.getTransaction().commit();
 	}
 
 	@Override
+	@Transactional
 	public void deleteRecord(long id) {
 		LOGGER.debug("deleting record");
-		Session session = this.sessionFactory.getCurrentSession();
-		Test t = session.load(Test.class, id);
-		if(null != t){
-			session.delete(t);
+		EntityManager em = getEntityManager();
+		Test t = em.find(Test.class, id);
+		
+		if (null != t) {
+			em.getTransaction().begin();
+			em.remove(t);
+			em.getTransaction().commit();
 		}
 	}
 
 	@Override
 	public void updateRecord(Test t) {
 		LOGGER.debug("updating record");
-		Session session = this.sessionFactory.getCurrentSession();
-		session.update(t);
+		EntityManager em = getEntityManager();
+		Test rec = em.find(Test.class, t.getId());
+		rec.setVal(t.getVal());
+		em.getTransaction().begin();
+		em.persist(rec);
+		em.getTransaction().commit();
 	}
 
 }
