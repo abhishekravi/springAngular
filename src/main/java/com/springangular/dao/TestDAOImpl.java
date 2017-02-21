@@ -9,7 +9,11 @@ import org.slf4j.LoggerFactory;
 
 import com.springangular.model.Test;
 
-
+/**
+ * DAO implementation.
+ * @author Abhishek Ravi Chandran
+ *
+ */
 public class TestDAOImpl implements TestDAO{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TestDAOImpl.class);

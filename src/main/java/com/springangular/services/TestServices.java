@@ -4,7 +4,11 @@ import java.util.List;
 
 import com.springangular.model.Test;
 
-
+/**
+ * service interface.
+ * @author Abhishek Ravi Chandran
+ *
+ */
 public interface TestServices {
 
 	public List<Test> getAllRecords();

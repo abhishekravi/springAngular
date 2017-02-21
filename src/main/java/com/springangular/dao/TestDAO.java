@@ -4,7 +4,11 @@ import java.util.List;
 
 import com.springangular.model.Test;
 
-
+/**
+ * DAO interface.
+ * @author Abhishek Ravi Chandran
+ *
+ */
 public interface TestDAO {
 
 	public List<Test> getAllRecords();
