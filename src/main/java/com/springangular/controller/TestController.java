@@ -87,4 +87,15 @@ public class TestController {
 		testService.removeRecord(id);
 	}
 	
+	/**
+	 * method to delete a record by id.
+	 * @param id
+	 */
+	@RequestMapping(value = "/api/test", method = RequestMethod.PUT)
+	@ResponseBody
+	public void updateRecord(@RequestBody Test t) {
+		LOGGER.debug("in update");
+		testService.updateRecord(t);
+	}
+	
 }
